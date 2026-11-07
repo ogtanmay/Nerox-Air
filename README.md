@@ -47,6 +47,10 @@ Generated APKs:
 - Debug: `app/build/outputs/apk/debug/`
 - Release (arm64-v8a split): `app/build/outputs/apk/release/`
 
+Push a `v*` tag (for example `v1.0.0`) to build the release APK and publish it
+to GitHub Releases. Pull requests and pushes to `main` produce a downloadable
+debug APK through the **Build and release** workflow.
+
 ## Optimization choices (Air)
 
 - Release minification + resource shrinking enabled

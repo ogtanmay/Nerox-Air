@@ -2,14 +2,21 @@ package com.nexamusic.air.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Pause
 import androidx.compose.material.icons.rounded.PlayArrow
@@ -17,7 +24,9 @@ import androidx.compose.material.icons.rounded.QueueMusic
 import androidx.compose.material.icons.rounded.Repeat
 import androidx.compose.material.icons.rounded.RepeatOne
 import androidx.compose.material.icons.rounded.Shuffle
+import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -36,8 +45,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.graphics.Color
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 import androidx.media3.common.Player
 import com.nexamusic.air.data.model.Track
@@ -90,8 +102,7 @@ fun NexaMusicAirApp(viewModel: MainViewModel) {
             color = MaterialTheme.colorScheme.surface.copy(alpha = 0.85f)
         ) {
             when (destination) {
-                NavDestination.Home -> TrackListScreen(
-                    title = "Recently Added",
+                NavDestination.Home -> HomeScreen(
                     tracks = localTracks,
                     onTrackClick = { index -> viewModel.playQueue(localTracks, index) }
                 )
@@ -109,6 +120,85 @@ fun NexaMusicAirApp(viewModel: MainViewModel) {
 
                 NavDestination.Settings -> SettingsScreen()
             }
+        }
+    }
+
+    @Composable
+    private fun HomeScreen(tracks: List<Track>, onTrackClick: (Int) -> Unit) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+            verticalArrangement = Arrangement.spacedBy(18.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text("Home", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+                Box(modifier = Modifier.weight(1f))
+                Box(
+                    modifier = Modifier.size(38.dp).clip(RoundedCornerShape(50))
+                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                listOf("All", "Podcasts", "Relax", "Energise", "Feel good").forEachIndexed { index, label ->
+                    AssistChip(
+                        onClick = {},
+                        label = { Text(label) },
+                        colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
+                            containerColor = if (index == 0) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.surfaceVariant,
+                            labelColor = if (index == 0) Color.White else MaterialTheme.colorScheme.onSurface
+                        ),
+                        border = null
+                    )
+                }
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Top picks for you", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+                Icon(Icons.Rounded.ChevronRight, contentDescription = null)
+            }
+
+            if (tracks.isEmpty()) {
+                Text(
+                    "Add music to your device to see your library here.",
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            } else {
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                    itemsIndexed(tracks.take(10), key = { _, track -> track.id }) { index, track ->
+                        Column(
+                            modifier = Modifier.width(190.dp).clickable { onTrackClick(index) },
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier.fillMaxWidth().height(190.dp)
+                                    .clip(RoundedCornerShape(18.dp))
+                                    .background(
+                                        listOf(
+                                            Color(0xFF673AB7), Color(0xFF00695C),
+                                            Color(0xFF8D4E28), Color(0xFF263238)
+                                        )[index % 4]
+                                    ),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(Icons.Rounded.QueueMusic, null, tint = Color.White, modifier = Modifier.size(48.dp))
+                            }
+                            Text(track.title, maxLines = 1, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.SemiBold)
+                            Text(track.artist, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                    }
+                }
+            }
+
+            Text("Recently added", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+            TrackList(tracks = tracks, onTrackClick = onTrackClick, modifier = Modifier.weight(1f))
         }
     }
 
