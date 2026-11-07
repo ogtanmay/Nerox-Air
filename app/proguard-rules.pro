@@ -1,0 +1,2 @@
+-keep class com.nexamusic.air.** { *; }
+-dontwarn org.json.**
