@@ -123,85 +123,6 @@ fun NexaMusicAirApp(viewModel: MainViewModel) {
         }
     }
 
-    @Composable
-    private fun HomeScreen(tracks: List<Track>, onTrackClick: (Int) -> Unit) {
-        Column(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(18.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Home", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
-                Box(modifier = Modifier.weight(1f))
-                Box(
-                    modifier = Modifier.size(38.dp).clip(RoundedCornerShape(50))
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
-                )
-            }
-
-            Row(
-                modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                listOf("All", "Podcasts", "Relax", "Energise", "Feel good").forEachIndexed { index, label ->
-                    AssistChip(
-                        onClick = {},
-                        label = { Text(label) },
-                        colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
-                            containerColor = if (index == 0) MaterialTheme.colorScheme.primary
-                            else MaterialTheme.colorScheme.surfaceVariant,
-                            labelColor = if (index == 0) Color.White else MaterialTheme.colorScheme.onSurface
-                        ),
-                        border = null
-                    )
-                }
-            }
-
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text("Top picks for you", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-                Icon(Icons.Rounded.ChevronRight, contentDescription = null)
-            }
-
-            if (tracks.isEmpty()) {
-                Text(
-                    "Add music to your device to see your library here.",
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            } else {
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    itemsIndexed(tracks.take(10), key = { _, track -> track.id }) { index, track ->
-                        Column(
-                            modifier = Modifier.width(190.dp).clickable { onTrackClick(index) },
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
-                        ) {
-                            Box(
-                                modifier = Modifier.fillMaxWidth().height(190.dp)
-                                    .clip(RoundedCornerShape(18.dp))
-                                    .background(
-                                        listOf(
-                                            Color(0xFF673AB7), Color(0xFF00695C),
-                                            Color(0xFF8D4E28), Color(0xFF263238)
-                                        )[index % 4]
-                                    ),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(Icons.Rounded.QueueMusic, null, tint = Color.White, modifier = Modifier.size(48.dp))
-                            }
-                            Text(track.title, maxLines = 1, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.SemiBold)
-                            Text(track.artist, maxLines = 1, overflow = TextOverflow.Ellipsis,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                    }
-                }
-            }
-
-            Text("Recently added", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
-            TrackList(tracks = tracks, onTrackClick = onTrackClick, modifier = Modifier.weight(1f))
-        }
-    }
-
     if (showFullPlayer && currentTrack != null) {
         FullPlayer(
             track = currentTrack,
@@ -218,6 +139,85 @@ fun NexaMusicAirApp(viewModel: MainViewModel) {
             onShuffle = viewModel::toggleShuffle,
             onRepeat = viewModel::cycleRepeat
         )
+    }
+}
+
+@Composable
+private fun HomeScreen(tracks: List<Track>, onTrackClick: (Int) -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(18.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Home", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+            Box(modifier = Modifier.weight(1f))
+            Box(
+                modifier = Modifier.size(38.dp).clip(RoundedCornerShape(50))
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth().horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            listOf("All", "Podcasts", "Relax", "Energise", "Feel good").forEachIndexed { index, label ->
+                AssistChip(
+                    onClick = {},
+                    label = { Text(label) },
+                    colors = androidx.compose.material3.AssistChipDefaults.assistChipColors(
+                        containerColor = if (index == 0) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.surfaceVariant,
+                        labelColor = if (index == 0) Color.White else MaterialTheme.colorScheme.onSurface
+                    ),
+                    border = null
+                )
+            }
+        }
+
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text("Top picks for you", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+            Icon(Icons.Rounded.ChevronRight, contentDescription = null)
+        }
+
+        if (tracks.isEmpty()) {
+            Text(
+                "Add music to your device to see your library here.",
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        } else {
+            LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                itemsIndexed(tracks.take(10), key = { _, track -> track.id }) { index, track ->
+                    Column(
+                        modifier = Modifier.width(190.dp).clickable { onTrackClick(index) },
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().height(190.dp)
+                                .clip(RoundedCornerShape(18.dp))
+                                .background(
+                                    listOf(
+                                        Color(0xFF673AB7), Color(0xFF00695C),
+                                        Color(0xFF8D4E28), Color(0xFF263238)
+                                    )[index % 4]
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(Icons.Rounded.QueueMusic, null, tint = Color.White, modifier = Modifier.size(48.dp))
+                        }
+                        Text(track.title, maxLines = 1, overflow = TextOverflow.Ellipsis, fontWeight = FontWeight.SemiBold)
+                        Text(track.artist, maxLines = 1, overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                }
+            }
+        }
+
+        Text("Recently added", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.SemiBold)
+        TrackList(tracks = tracks, onTrackClick = onTrackClick, modifier = Modifier.weight(1f))
     }
 }
 
